@@ -25,6 +25,7 @@ const lazyReducer = (state, action) => {
 
     // Maybe key can be None so the last key is used?
     let currentState = state;
+    console.log("STATE UPDATE", state, action);
 
     if(!key){
         if(baseKey && baseKey.length){
