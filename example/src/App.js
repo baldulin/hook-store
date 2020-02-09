@@ -1,13 +1,12 @@
-import React, { Component } from 'react'
+import React from 'react'
+import {useStore, useRootStoreLoad, useStoreLoad} from 'hook-store'
 
-import ExampleComponent from 'hook-store'
+const App = () => {
+    const [store, realDispatch] = useStore();
 
-export default class App extends Component {
-  render () {
-    return (
-      <div>
-        <ExampleComponent text='Modern React component module' />
-      </div>
-    )
-  }
-}
+    return <div>
+        Test
+    </div>
+};
+
+export default App;
