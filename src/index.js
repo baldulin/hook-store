@@ -2,15 +2,13 @@ import {useCallback, useEffect, useReducer, useState} from 'react';
 import Axios from 'axios';
 
 const turnLazy = (dispatch, baseKey, data) => {
-    let currentData = data;
-
     if(!data || typeof data !== "object"){
         return data;
     }
 
     // this is wrong iterate object if data is object
-    for(let key of Object.keys(data)){
-        currentData[key] = turnLazy(dispatch, baseKey.concat([key]), currentData[key]);
+    for(let key in data){
+        data[key] = turnLazy(dispatch, baseKey.concat([key]), data[key]);
     }
 
     if(Array.isArray(data)){
@@ -35,6 +33,7 @@ const lazyReducer = (state, action) => {
     }
     if(baseKey){
         for(let k of baseKey){
+            // TODO needs error message
             if(Array.isArray(currentState[k])){
                 currentState = [...currentState[k]];
             }
