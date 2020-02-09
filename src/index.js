@@ -8,7 +8,6 @@ const turnLazy = (dispatch, baseKey, data) => {
 
     // this is wrong iterate object if data is object
     for(let key in data){
-        console.log("Turn Lazy", key, data);
         data[key] = turnLazy(dispatch, baseKey.concat([key]), data[key]);
     }
 
@@ -35,6 +34,7 @@ const lazyReducer = (state, action) => {
     if(baseKey){
         for(let k of baseKey){
             // TODO needs error message
+            console.log("WANTS KEY", k, currentState);
             if(Array.isArray(currentState[k])){
                 currentState = [...currentState[k]];
             }
