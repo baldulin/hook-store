@@ -108,7 +108,7 @@ export const useStoreLoad = (state, key, url, params, defaultValue) => {
     return [oldObject, oldObject ? oldObject.$dispatch : oldObject, loading, error];
 };
 
-export const useRootStoreLoad(url, params, defaultValue) => {
+export const useRootStoreLoad = (url, params, defaultValue) => {
     const [store, realDispatch] = useStore(defaultValue);
     const [, dispatch, loading, error] = useStoreLoad(store, null, url, params);
     return [store, dispatch, loading, error];
