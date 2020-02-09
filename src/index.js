@@ -71,7 +71,7 @@ export const useStoreLoad = (state, key, url, params, defaultValue) => {
     const [error, setError] = useState();
     const [loading, setLoading] = useState(true);
     
-    useEffect() => {
+    useEffect(() => {
         if(!oldObject && defaultValue){
             state.$dispatch(key, defaultValue);
         }
