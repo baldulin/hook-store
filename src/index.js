@@ -8,6 +8,7 @@ const turnLazy = (dispatch, baseKey, data) => {
 
     // this is wrong iterate object if data is object
     for(let key in data){
+        console.log("Turn Lazy", key, data);
         data[key] = turnLazy(dispatch, baseKey.concat([key]), data[key]);
     }
 
