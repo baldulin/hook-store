@@ -5,11 +5,10 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "axios": "^0.19.2",
+    "hook-store": "file:..",
     "prop-types": "^15.6.2",
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1",
-    "react-scripts": "^1.1.4",
-    "hook-store": "file:.."
+    "react-scripts": "^1.1.4"
   },
   "scripts": {
     "start": "react-scripts start",

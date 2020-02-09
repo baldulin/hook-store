@@ -7,12 +7,17 @@ const turnLazy = (dispatch, baseKey, data) => {
     }
 
     // this is wrong iterate object if data is object
-    for(let key in data){
-        data[key] = turnLazy(dispatch, baseKey.concat([key]), data[key]);
-    }
 
     if(Array.isArray(data)){
+        for(let key=0;key < data.length; key++){
+            data[key] = turnLazy(dispatch, baseKey.concat([key]), data[key]);
+        }
         return data;
+    }
+    else{
+        for(let key in data){
+            data[key] = turnLazy(dispatch, baseKey.concat([key]), data[key]);
+        }
     }
     return {...data, $dispatch: (key, data) => dispatch({dispatch, baseKey, key, data})};
 };
@@ -23,7 +28,6 @@ const lazyReducer = (state, action) => {
 
     // Maybe key can be None so the last key is used?
     let currentState = state;
-    console.log("STATE UPDATE", state, action);
 
     if(!key){
         if(baseKey && baseKey.length){
@@ -31,15 +35,15 @@ const lazyReducer = (state, action) => {
             baseKey = baseKey.slice(0, -1);
         }
     }
+
     if(baseKey){
         for(let k of baseKey){
             // TODO needs error message
-            console.log("WANTS KEY", k, currentState);
             if(Array.isArray(currentState[k])){
-                currentState = [...currentState[k]];
+                currentState[k] = [...currentState[k]];
             }
             else{
-                currentState = {...currentState[k]};
+                currentState[k] = {...currentState[k]};
             }
             currentState = currentState[k];
         }
