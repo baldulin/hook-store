@@ -1,120 +1,14 @@
-import {useCallback, useEffect, useReducer, useState} from 'react';
-import Axios from 'axios';
+import React, {useReducer, useRef} from 'react';
+import {reducer} from './reducer';
+import {reproxify} from './proxy';
 
-const turnLazy = (dispatch, baseKey, data) => {
-    if(!data || typeof data !== "object"){
-        return data;
-    }
 
-    // this is wrong iterate object if data is object
-
-    if(Array.isArray(data)){
-        for(let key=0;key < data.length; key++){
-            data[key] = turnLazy(dispatch, baseKey.concat([key]), data[key]);
-        }
-        return data;
-    }
-    else{
-        for(let key in data){
-            data[key] = turnLazy(dispatch, baseKey.concat([key]), data[key]);
-        }
-    }
-    return {...data, $dispatch: (key, data) => dispatch({dispatch, baseKey, key, data})};
+const useProxyState = (initialState) => {
+    const [state, dispatch] = useReducer(reducer, initialState);
+    const ref = useRef(null);
+    ref.current = reproxify(ref.current, state, [], dispatch);
+    return ref.current
 };
 
-const lazyReducer = (state, action) => {
-    const {data, dispatch} = action;
-    let {baseKey, key} = action;
 
-    // Maybe key can be None so the last key is used?
-    let currentState = state;
-
-    if(!key){
-        if(baseKey && baseKey.length){
-            key = Array.lastIndexOf(baseKey);
-            baseKey = baseKey.slice(0, -1);
-        }
-    }
-
-    if(baseKey){
-        for(let k of baseKey){
-            // TODO needs error message
-            if(Array.isArray(currentState[k])){
-                currentState[k] = [...currentState[k]];
-            }
-            else{
-                currentState[k] = {...currentState[k]};
-            }
-            currentState = currentState[k];
-        }
-    }
-    else{
-        baseKey = [];
-    }
-
-    if(key){
-        const turnedLazy = turnLazy(dispatch, baseKey.concat([key]), data);
-        currentState[key] = turnedLazy;
-    }
-    else{
-        return turnLazy(dispatch, [], data);
-    }
-
-    return {...state};
-};
-
-export const useStore = (initialState) => {
-    const [state, dispatch] = useReducer(lazyReducer, initialState ? initialState : {});
-    const $dispatch = useCallback(
-        (key, data) => dispatch({dispatch, baseKey: undefined, key, data}), [dispatch]
-    );
-    return [{...state, $dispatch}, $dispatch];
-};
-
-export const useStoreLoad = (state, key, url, params, defaultValue) => {
-    const oldObject = key ? state[key] : state;
-    const [error, setError] = useState();
-    const [loading, setLoading] = useState(true);
-    
-    useEffect(() => {
-        if(!oldObject && defaultValue){
-            state.$dispatch(key, defaultValue);
-        }
-    }, [defaultValue]);
-
-    useEffect(() => {
-        setLoading(true);
-        let cancler;
-
-        Axios(url, {...params, cancelToken: new Axios.CancelToken((c) => {cancler=c})})
-        .then((response) => {
-            if(!response.data.error){
-                state.$dispatch(key, response.data);
-                setLoading(false);
-                setError(null);
-            }
-            else{
-                state.$dispatch(undefined, key, null);
-                setLoading(false);
-                // TODO this is not an axios error result
-                setError(response);
-            }
-        })
-        .catch((error) => {
-            setLoading(false);
-            setError(error);
-        });
-
-        return () => {
-            cancler(); 
-        };
-    }, []);
-
-    return [oldObject, oldObject ? oldObject.$dispatch : oldObject, loading, error];
-};
-
-export const useRootStoreLoad = (url, params, defaultValue) => {
-    const [store, realDispatch] = useStore(defaultValue);
-    const [, dispatch, loading, error] = useStoreLoad(store, null, url, params);
-    return [store, dispatch, loading, error];
-};
+export default useProxyState;
