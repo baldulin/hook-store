@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import useProxyState from 'hook-store';
 
 const ObjectExample = () => {
@@ -31,6 +31,7 @@ const ObjectExample = () => {
 
 const ListExample = () => {
     const state = useProxyState([]);
+    const [selected, setSelected] = useState(null);
 
     return <article style={{border: "1px solid black"}}>
         <table>
@@ -51,6 +52,27 @@ const ListExample = () => {
         </table>
         {state.map((item, i) => (
             <div key={i}>
+                {selected !== i
+                    ? <button onClick={() => {
+                            if(selected === null){
+                                setSelected(i)
+                            }
+                            else{
+                                setSelected(null);
+                                state.$dispatch((oldState) => {
+                                    const a = oldState[i];
+                                    const b = oldState[selected];
+                                    const newState = [...oldState];
+                                    newState[i] = b;
+                                    newState[selected] = a;
+                                    return newState;
+                                });
+                            }
+                        }}>
+                        Select to Switch
+                    </button>
+                    : <span>Select another element</span>
+                }
                 <input type="text" value={item.a} onChange={(ev) => item.a = ev.target.value}/>
                 <input type="text" value={item.b} onChange={(ev) => item.b = ev.target.value}/>
                 <button onClick={item.$delete}>
