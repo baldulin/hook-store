@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import useProxyState from 'hook-store';
 
 const ObjectExample = () => {
-    const state = useProxyState({
+    const [state, ,] = useProxyState({
         title: "Title",
         content: "Content text",
         subObject: {
@@ -30,7 +30,7 @@ const ObjectExample = () => {
 };
 
 const ListExample = () => {
-    const state = useProxyState([]);
+    const [state, ,] = useProxyState([]);
     const [selected, setSelected] = useState(null);
 
     return <article style={{border: "1px solid black"}}>
@@ -86,10 +86,27 @@ const ListExample = () => {
     </article>
 };
 
+const StartEmptyExample = () => {
+    const [state, updateState] = useProxyState(null);
+
+    return <div style={{border: "1px solid red"}}>
+        <pre>
+            {JSON.stringify(state)}
+        </pre>
+        <button onClick={() => updateState({eins: "zwei"})}>
+            Insert state
+        </button>
+        {state &&
+            <input type="text" value={state.eins} onChange={(ev) => state.eins = ev.target.value}/>
+        }
+    </div>
+};
+
 const App = () => (
     <div>
         <ObjectExample/>
         <ListExample/>
+        <StartEmptyExample/>
     </div>
 );
 export default App;
