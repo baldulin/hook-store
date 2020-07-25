@@ -72,7 +72,7 @@ export const proxify = (data, keys, dispatch) => {
 
 export const reproxify = (proxies, data, keys, dispatch) => {
     if(Array.isArray(data) && Array.isArray(proxies) && data.length === proxies.length){
-        if(data.some((item, i) => (proxies[i] && proxies[i].$ident !== item))){
+        if(data.some((item, i) => (proxies[i] === undefined || proxies[i].$ident !== item))){
             let newData = data.map(
                 (item, i) => (
                     (proxies[i] && proxies[i].$ident && proxies[i].$ident === item)
@@ -92,7 +92,7 @@ export const reproxify = (proxies, data, keys, dispatch) => {
         }
     }
     else if(isObject(data) && isObject(proxies)){
-        if(Object.keys(data).some((i) => proxies[i].$ident !== data[i])){
+        if(Object.keys(data).some((i) => (proxies[i] === undefined || proxies[i].$ident !== data[i]))){
             const newData = {
                 ...Object.keys(data).reduce((a, i) => (
                     {
